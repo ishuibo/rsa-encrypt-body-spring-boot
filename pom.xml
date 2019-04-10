@@ -7,12 +7,22 @@
     <version>1.0.0-RELEASE</version>
     <name>rsa-encrypt-body-spring-boot</name>
     <description>SpringBoot 参数请求 值返回 注解RSA加密</description>
+    <url>https://www.shuibo.cn</url>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <springboot-version>2.1.4.RELEASE</springboot-version>
+    </properties>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -22,21 +32,22 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/ishuibo/rsa-encrypt-body-spring-boot.git</connection>
-        <developerConnection>scm:git:ssh://github.com:ishuibo/rsa-encrypt-body-spring-boot.git</developerConnection>
         <url>http://github.com/ishuibo/rsa-encrypt-body-spring-boot.git</url>
+        <connection>scm:git:git://github.com/ishuibo/rsa-encrypt-body-spring-boot.git</connection>
+        <developerConnection>https://www.shuibo.cn</developerConnection>
     </scm>
 
     <developers>
         <developer>
             <name>shuibo</name>
             <email>i@shuibo.cn</email>
-            <organization>https://www.shuibo.cn</organization>
+            <url>https://www.shuibo.cn</url>
             <timezone>+8</timezone>
         </developer>
     </developers>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -47,6 +58,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -73,11 +90,29 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${springboot-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

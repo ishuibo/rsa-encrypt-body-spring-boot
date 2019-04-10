@@ -31,10 +31,10 @@ public class RSAUtil{
 
     /**
      * encryption
-     * @param data
-     * @param publicKey
-     * @return
-     * @throws Exception
+     * @param data data
+     * @param publicKey publicKey
+     * @return byte
+     * @throws Exception Exception
      */
     public static byte[] encrypt(byte[] data, String publicKey)
             throws Exception {
@@ -67,10 +67,10 @@ public class RSAUtil{
 
     /**
      * Decrypt
-     * @param text
-     * @param privateKey
-     * @return
-     * @throws Exception
+     * @param text text
+     * @param privateKey privateKey
+     * @return byte
+     * @throws Exception Exception
      */
     public static byte[] decrypt(byte[] text, String privateKey)
             throws Exception {
