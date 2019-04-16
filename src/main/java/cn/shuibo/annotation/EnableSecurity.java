@@ -1,5 +1,10 @@
 package cn.shuibo.annotation;
 
+import cn.shuibo.advice.EncryptRequestBodyAdvice;
+import cn.shuibo.advice.EncryptResponseBodyAdvice;
+import cn.shuibo.config.SecretKeyConfig;
+import org.springframework.context.annotation.Import;
+
 import java.lang.annotation.*;
 
 /**
@@ -8,7 +13,11 @@ import java.lang.annotation.*;
  **/
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 @Documented
+@Import({SecretKeyConfig.class,
+        EncryptResponseBodyAdvice.class,
+        EncryptRequestBodyAdvice.class})
 public @interface EnableSecurity{
 
 }
