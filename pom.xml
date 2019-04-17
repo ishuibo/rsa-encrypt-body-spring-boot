@@ -6,7 +6,7 @@
     <artifactId>rsa-encrypt-body-spring-boot</artifactId>
     <version>1.0.0.RELEASE</version>
     <name>rsa-encrypt-body-spring-boot</name>
-    <description>SpringBoot 参数请求 值返回 注解RSA加密</description>
+    <description>Spring Boot接口加密，可以对返回值、参数值通过注解的方式自动加解密</description>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
