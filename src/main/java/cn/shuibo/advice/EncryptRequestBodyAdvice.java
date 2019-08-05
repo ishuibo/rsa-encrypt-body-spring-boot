@@ -28,7 +28,7 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        if (methodParameter.getMethod().isAnnotationPresent(Decrypt.class) && !secretKeyConfig.isDebug()) {
+        if (methodParameter.getMethod().isAnnotationPresent(Decrypt.class) && secretKeyConfig.isOpen()) {
             encrypt = true;
         }
         return encrypt;
@@ -44,7 +44,7 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
                                            Class<? extends HttpMessageConverter<?>> converterType){
         if (encrypt) {
             try {
-                return new DecryptHttpInputMessage(inputMessage, secretKeyConfig.getPrivateKey(), secretKeyConfig.getCharset());
+                return new DecryptHttpInputMessage(inputMessage, secretKeyConfig.getPrivateKey(), secretKeyConfig.getCharset(),secretKeyConfig.isShowLog());
             } catch (Exception e) {
                 log.error("Decryption failed", e);
             }

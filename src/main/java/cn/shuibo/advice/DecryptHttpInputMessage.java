@@ -11,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 
@@ -24,7 +26,8 @@ public class DecryptHttpInputMessage implements HttpInputMessage{
     private HttpHeaders headers;
     private InputStream body;
 
-    public DecryptHttpInputMessage(HttpInputMessage inputMessage, String privateKey, String charset) throws Exception {
+
+    public DecryptHttpInputMessage(HttpInputMessage inputMessage, String privateKey, String charset, boolean showLog) throws Exception {
 
         if (StringUtils.isEmpty(privateKey)) {
             throw new IllegalArgumentException("privateKey is null");
@@ -49,7 +52,9 @@ public class DecryptHttpInputMessage implements HttpInputMessage{
                 }
             }
             decryptBody = json.toString();
-            log.info("Encrypted data received：{},After decryption：{}", content, decryptBody);
+            if(showLog) {
+                log.info("Encrypted data received：{},After decryption：{}", content, decryptBody);
+            }
         }
         this.body = new ByteArrayInputStream(decryptBody.getBytes());
     }

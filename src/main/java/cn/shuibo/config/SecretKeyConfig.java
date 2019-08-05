@@ -17,7 +17,9 @@ public class SecretKeyConfig{
 
     private String charset = "UTF-8";
 
-    private boolean debug = false;
+    private boolean open = true;
+
+    private boolean showLog = false;
 
     public String getPrivateKey() {
         return privateKey;
@@ -43,11 +45,19 @@ public class SecretKeyConfig{
         this.charset = charset;
     }
 
-    public boolean isDebug() {
-        return debug;
+    public boolean isOpen() {
+        return open;
     }
 
-    public void setDebug(boolean debug) {
-        this.debug = debug;
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean isShowLog() {
+        return showLog;
+    }
+
+    public void setShowLog(boolean showLog) {
+        this.showLog = showLog;
     }
 }

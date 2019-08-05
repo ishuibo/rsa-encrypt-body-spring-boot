@@ -36,7 +36,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         encrypt = false;
-        if (returnType.getMethod().isAnnotationPresent(Encrypt.class) && !secretKeyConfig.isDebug()) {
+        if (returnType.getMethod().isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen()) {
             encrypt = true;
         }
         return encrypt;
@@ -62,7 +62,9 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
                 byte[] data = content.getBytes();
                 byte[] encodedData = RSAUtil.encrypt(data, publicKey);
                 String result = Base64Util.encode(encodedData);
-                log.info("Pre-encrypted data：{}，After encryption：{}", content, result);
+                if(secretKeyConfig.isShowLog()) {
+                    log.info("Pre-encrypted data：{}，After encryption：{}", content, result);
+                }
                 return result;
             } catch (Exception e) {
                 log.error("Encrypted data exception", e);
