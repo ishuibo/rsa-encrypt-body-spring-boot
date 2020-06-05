@@ -2,6 +2,7 @@ package cn.shuibo.advice;
 
 import cn.shuibo.annotation.Decrypt;
 import cn.shuibo.config.SecretKeyConfig;
+import cn.shuibo.exception.EncryptRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,10 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
+
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * Author:Bobby
@@ -22,14 +26,20 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private boolean encrypt;
+    private Decrypt decryptAnnotation;
 
     @Autowired
     private SecretKeyConfig secretKeyConfig;
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-        if (methodParameter.getMethod().isAnnotationPresent(Decrypt.class) && secretKeyConfig.isOpen()) {
+        Method method = methodParameter.getMethod();
+        if (Objects.isNull(method)) {
+            return encrypt;
+        }
+        if (method.isAnnotationPresent(Decrypt.class) && secretKeyConfig.isOpen()) {
             encrypt = true;
+            decryptAnnotation = methodParameter.getMethodAnnotation(Decrypt.class);
         }
         return encrypt;
     }
@@ -44,7 +54,9 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
                                            Class<? extends HttpMessageConverter<?>> converterType){
         if (encrypt) {
             try {
-                return new DecryptHttpInputMessage(inputMessage, secretKeyConfig.getPrivateKey(), secretKeyConfig.getCharset(),secretKeyConfig.isShowLog());
+                return new DecryptHttpInputMessage(inputMessage, secretKeyConfig, decryptAnnotation);
+            } catch (EncryptRequestException e) {
+                throw e;
             } catch (Exception e) {
                 log.error("Decryption failed", e);
             }

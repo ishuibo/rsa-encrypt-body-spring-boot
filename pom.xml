@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.shuibo</groupId>
     <artifactId>rsa-encrypt-body-spring-boot</artifactId>
-    <version>1.0.1.RELEASE</version>
+    <version>1.0.2.RELEASE</version>
     <name>rsa-encrypt-body-spring-boot</name>
     <description>Spring Boot 接口请求参数自动加解密</description>
 

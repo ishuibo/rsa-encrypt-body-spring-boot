@@ -21,6 +21,12 @@ public class SecretKeyConfig{
 
     private boolean showLog = false;
 
+    /**
+     * 请求数据时间戳校验时间差
+     * 超过指定时间的数据认定为伪造
+     */
+    private boolean timestampCheck = false;
+
     public String getPrivateKey() {
         return privateKey;
     }
@@ -59,5 +65,13 @@ public class SecretKeyConfig{
 
     public void setShowLog(boolean showLog) {
         this.showLog = showLog;
+    }
+
+    public boolean isTimestampCheck() {
+        return timestampCheck;
+    }
+
+    public void setTimestampCheck(boolean timestampCheck) {
+        this.timestampCheck = timestampCheck;
     }
 }
