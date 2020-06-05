@@ -17,6 +17,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.lang.reflect.Method;
+import java.util.Objects;
+
 /**
  * Author:Bobby
  * DateTime:2019/4/9
@@ -35,10 +38,11 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        encrypt = false;
-        if (returnType.getMethod().isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen()) {
-            encrypt = true;
+        Method method = returnType.getMethod();
+        if (Objects.isNull(method)) {
+            return encrypt;
         }
+        encrypt = method.isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen();
         return encrypt;
     }
 
