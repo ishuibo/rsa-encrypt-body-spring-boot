@@ -4,8 +4,8 @@ import cn.shuibo.annotation.Decrypt;
 import cn.shuibo.config.SecretKeyConfig;
 import cn.shuibo.exception.EncryptRequestException;
 import cn.shuibo.util.Base64Util;
+import cn.shuibo.util.JsonUtils;
 import cn.shuibo.util.RSAUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DecryptHttpInputMessage implements HttpInputMessage {
         if (timestampCheck) {
             // 容忍最小请求时间
             long toleranceTime = System.currentTimeMillis() - decrypt.timeout();
-            long requestTime = JSON.parseObject(decryptBody).getLongValue("timestamp");
+            long requestTime = JsonUtils.getNode(decryptBody, "timestamp").asLong();
             // 如果请求时间小于最小容忍请求时间, 判定为超时
             if (requestTime < toleranceTime) {
                 log.error("Encryption request has timed out, toleranceTime:{}, requestTime:{}, After decryption：{}", toleranceTime, requestTime, decryptBody);

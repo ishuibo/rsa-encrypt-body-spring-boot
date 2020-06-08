@@ -3,8 +3,8 @@ package cn.shuibo.advice;
 import cn.shuibo.annotation.Encrypt;
 import cn.shuibo.config.SecretKeyConfig;
 import cn.shuibo.util.Base64Util;
+import cn.shuibo.util.JsonUtils;
 import cn.shuibo.util.RSAUtil;
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (encrypt) {
             String publicKey = secretKeyConfig.getPublicKey();
             try {
-                String content = JSON.toJSONString(body);
+                String content = JsonUtils.writeValueAsString(body);
                 if (!StringUtils.hasText(publicKey)) {
                     throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
                 }
@@ -74,6 +74,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
                 log.error("Encrypted data exception", e);
             }
         }
+
         return body;
     }
 }

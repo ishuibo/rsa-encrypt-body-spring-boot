@@ -35,13 +35,17 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
     public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
         Method method = methodParameter.getMethod();
         if (Objects.isNull(method)) {
-            return encrypt;
+            encrypt = false;
+            return false;
         }
         if (method.isAnnotationPresent(Decrypt.class) && secretKeyConfig.isOpen()) {
             encrypt = true;
             decryptAnnotation = methodParameter.getMethodAnnotation(Decrypt.class);
+            return true;
         }
-        return encrypt;
+        // 此处如果按照原逻辑直接返回encrypt, 会造成一次修改为true之后, 后续请求都会变成true, 在不支持时, 需要做修正
+        encrypt = false;
+        return false;
     }
 
     @Override
