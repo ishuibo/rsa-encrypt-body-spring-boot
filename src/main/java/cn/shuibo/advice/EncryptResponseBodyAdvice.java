@@ -3,8 +3,8 @@ package cn.shuibo.advice;
 import cn.shuibo.annotation.Encrypt;
 import cn.shuibo.config.SecretKeyConfig;
 import cn.shuibo.util.Base64Util;
+import cn.shuibo.util.JsonUtils;
 import cn.shuibo.util.RSAUtil;
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * Author:Bobby
@@ -35,10 +38,11 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        encrypt = false;
-        if (returnType.getMethod().isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen()) {
-            encrypt = true;
+        Method method = returnType.getMethod();
+        if (Objects.isNull(method)) {
+            return encrypt;
         }
+        encrypt = method.isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen();
         return encrypt;
     }
 
@@ -55,7 +59,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (encrypt) {
             String publicKey = secretKeyConfig.getPublicKey();
             try {
-                String content = JSON.toJSONString(body);
+                String content = JsonUtils.writeValueAsString(body);
                 if (!StringUtils.hasText(publicKey)) {
                     throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
                 }
@@ -70,6 +74,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
                 log.error("Encrypted data exception", e);
             }
         }
+
         return body;
     }
 }
