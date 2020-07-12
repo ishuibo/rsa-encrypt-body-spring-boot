@@ -3,8 +3,8 @@ package cn.shuibo.advice;
 import cn.shuibo.annotation.EnDecrypt;
 import cn.shuibo.annotation.Encrypt;
 import cn.shuibo.config.SecretKeyConfig;
+import cn.shuibo.covert.AbstractResponseCovert;
 import cn.shuibo.util.Base64Util;
-import cn.shuibo.util.JsonUtils;
 import cn.shuibo.util.RSAUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +35,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Autowired
     private SecretKeyConfig secretKeyConfig;
+    @Autowired
+    private AbstractResponseCovert responseCovert;
 
     private static ThreadLocal<Boolean> encryptLocal = new ThreadLocal<>();
 
@@ -62,7 +64,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (encrypt) {
             String publicKey = secretKeyConfig.getPublicKey();
             try {
-                String content = JsonUtils.writeValueAsString(body);
+                String content = responseCovert.covert(body);
                 if (!StringUtils.hasText(publicKey)) {
                     throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
                 }
