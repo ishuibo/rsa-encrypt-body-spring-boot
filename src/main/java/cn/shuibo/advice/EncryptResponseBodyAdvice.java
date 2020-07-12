@@ -1,5 +1,6 @@
 package cn.shuibo.advice;
 
+import cn.shuibo.annotation.EnDecrypt;
 import cn.shuibo.annotation.Encrypt;
 import cn.shuibo.config.SecretKeyConfig;
 import cn.shuibo.util.Base64Util;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -42,7 +44,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (Objects.isNull(method)) {
             return encrypt;
         }
-        encrypt = method.isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen();
+        Encrypt mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(EnDecrypt.class, Encrypt.class);
+        encrypt = Objects.nonNull(mergedAnnotation) && secretKeyConfig.isOpen();
         return encrypt;
     }
 

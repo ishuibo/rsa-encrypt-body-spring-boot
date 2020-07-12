@@ -1,12 +1,14 @@
 package cn.shuibo.advice;
 
 import cn.shuibo.annotation.Decrypt;
+import cn.shuibo.annotation.EnDecrypt;
 import cn.shuibo.config.SecretKeyConfig;
 import cn.shuibo.exception.EncryptRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -38,9 +40,10 @@ public class EncryptRequestBodyAdvice  implements RequestBodyAdvice {
             encrypt = false;
             return false;
         }
-        if (method.isAnnotationPresent(Decrypt.class) && secretKeyConfig.isOpen()) {
+        Decrypt decrypt = AnnotatedElementUtils.findMergedAnnotation(EnDecrypt.class, Decrypt.class);
+        if (Objects.nonNull(decrypt) && secretKeyConfig.isOpen()) {
             encrypt = true;
-            decryptAnnotation = methodParameter.getMethodAnnotation(Decrypt.class);
+            decryptAnnotation = decrypt;
             return true;
         }
         // 此处如果按照原逻辑直接返回encrypt, 会造成一次修改为true之后, 后续请求都会变成true, 在不支持时, 需要做修正
