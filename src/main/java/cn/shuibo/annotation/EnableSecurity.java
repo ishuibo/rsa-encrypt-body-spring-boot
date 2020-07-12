@@ -18,6 +18,6 @@ import java.lang.annotation.*;
 @Import({SecretKeyConfig.class,
         EncryptResponseBodyAdvice.class,
         EncryptRequestBodyAdvice.class})
-public @interface EnableSecurity{
+public @interface EnableSecurity {
 
 }
