@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +20,11 @@ import java.util.stream.Collectors;
  * DateTime:2019/4/9
  **/
 public class DecryptHttpInputMessage implements HttpInputMessage {
+
+    /**
+     * 时间戳字段
+     */
+    private static final String TIMESTAMP = "timestamp";
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
     private HttpHeaders headers;
@@ -71,18 +73,40 @@ public class DecryptHttpInputMessage implements HttpInputMessage {
         }
 
         // 开启时间戳检查
-        if (timestampCheck) {
-            // 容忍最小请求时间
-            long toleranceTime = System.currentTimeMillis() - decrypt.timeout();
-            long requestTime = JsonUtils.getNode(decryptBody, "timestamp").asLong();
-            // 如果请求时间小于最小容忍请求时间, 判定为超时
-            if (requestTime < toleranceTime) {
-                log.error("Encryption request has timed out, toleranceTime:{}, requestTime:{}, After decryption：{}", toleranceTime, requestTime, decryptBody);
-                throw new EncryptRequestException("request timeout");
-            }
-        }
+        this.timeCheck(decrypt, timestampCheck, decryptBody);
 
         this.body = new ByteArrayInputStream(decryptBody.getBytes());
+    }
+
+    private void timeCheck(Decrypt decrypt, boolean timestampCheck, String decryptBody) throws IOException {
+
+        if (!timestampCheck) {
+            return;
+        }
+
+        if (!JsonUtils.hasNode(decryptBody, TIMESTAMP)) {
+            log.error("Cipher text does not contain timestamp, After decryption：{}", decryptBody);
+            throw new EncryptRequestException("Encrypted package error");
+        }
+
+        long currTime = System.currentTimeMillis();
+        long requestTime = JsonUtils.getNode(decryptBody, TIMESTAMP).asLong();
+
+        // 请求时间为当前服务器未来时间
+        if (requestTime > currTime) {
+            log.error("The request time is the future time of the current server, " +
+                    "currTime:{}, requestTime:{}, After decryption：{}", currTime, requestTime, decryptBody);
+            throw new EncryptRequestException("request timeout");
+        }
+
+        // 最小容忍请求时间
+        long toleranceTime = currTime - decrypt.timeout();
+        // 如果请求时间小于最小容忍请求时间, 判定为超时
+        if (requestTime < toleranceTime) {
+            log.error("Encryption request has timed out, toleranceTime:{}, requestTime:{}, After decryption：{}",
+                    toleranceTime, requestTime, decryptBody);
+            throw new EncryptRequestException("request timeout");
+        }
     }
 
     @Override

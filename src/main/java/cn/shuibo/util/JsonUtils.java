@@ -24,6 +24,11 @@ public class JsonUtils {
         return jsonNode.get(key);
     }
 
+    public static boolean hasNode(String content, String key) throws IOException {
+        JsonNode jsonNode = OBJECT_MAPPER.readTree(content);
+        return jsonNode.has(key);
+    }
+
     public static String writeValueAsString(Object body) throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsString(body);
     }
