@@ -88,6 +88,40 @@ public @interface Decrypt{
 
 ```
 
+- **@EnDecrypt**, 一个注解实现入参/响应加密
+```java
+@Decrypt
+@Encrypt
+public @interface EnDecrypt {
+
+    /**
+     * 请求参数一定要是加密内容
+     */
+    @AliasFor(annotation = Decrypt.class, value = "required")
+    boolean required() default false;
+
+    /**
+     * 请求数据时间戳校验时间差
+     * 超过(当前时间-指定时间)的数据认定为伪造
+     * 注意应用程序需要捕获 {@link cn.shuibo.exception.EncryptRequestException} 异常
+     */
+    @AliasFor(annotation = Decrypt.class, value = "timeout")
+    long timeout() default 3000;
+}
+```
+
+- **AbstractResponseCovert**, 依赖方可自定义JSON响应转换工具
+```java
+@Component
+public class ResponseCovert extends AbstractResponseCovert {
+
+    @Override
+    public String covert(Object body) {
+        return JSON.toJSONString(body);
+    }
+}
+```
+
 ### 3.About author
 ![码农届首家互娱自媒体](https://images.gitee.com/uploads/images/2020/0529/112357_aac5a702_1674154.jpeg "kxmn.jpg")
 - Blog：https://shuibo.cn

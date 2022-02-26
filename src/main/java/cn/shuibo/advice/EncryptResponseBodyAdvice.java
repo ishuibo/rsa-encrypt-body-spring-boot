@@ -1,14 +1,16 @@
 package cn.shuibo.advice;
 
+import cn.shuibo.annotation.EnDecrypt;
 import cn.shuibo.annotation.Encrypt;
 import cn.shuibo.config.SecretKeyConfig;
+import cn.shuibo.covert.AbstractResponseCovert;
 import cn.shuibo.util.Base64Util;
-import cn.shuibo.util.JsonUtils;
 import cn.shuibo.util.RSAUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -33,6 +35,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Autowired
     private SecretKeyConfig secretKeyConfig;
+    @Autowired
+    private AbstractResponseCovert responseCovert;
 
     private static ThreadLocal<Boolean> encryptLocal = new ThreadLocal<>();
 
@@ -42,7 +46,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (Objects.isNull(method)) {
             return encrypt;
         }
-        encrypt = method.isAnnotationPresent(Encrypt.class) && secretKeyConfig.isOpen();
+        Encrypt mergedAnnotation = AnnotatedElementUtils.findMergedAnnotation(EnDecrypt.class, Encrypt.class);
+        encrypt = Objects.nonNull(mergedAnnotation) && secretKeyConfig.isOpen();
         return encrypt;
     }
 
@@ -59,7 +64,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         if (encrypt) {
             String publicKey = secretKeyConfig.getPublicKey();
             try {
-                String content = JsonUtils.writeValueAsString(body);
+                String content = responseCovert.covert(body);
                 if (!StringUtils.hasText(publicKey)) {
                     throw new NullPointerException("Please configure rsa.encrypt.privatekeyc parameter!");
                 }
