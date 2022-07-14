@@ -4,6 +4,8 @@ import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -49,16 +51,19 @@ public class RSAUtil{
         int offSet = 0;
         byte[] cache;
         int i = 0;
+        int keyBit = getKeySize(publicK);
+        // get step
+        int step = keyBit / 8 - 11;
         // Sectional Encryption of Data
         while (inputLen - offSet > 0) {
-            if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
-                cache = cipher.doFinal(data, offSet, MAX_ENCRYPT_BLOCK);
+            if (inputLen - offSet > step) {
+                cache = cipher.doFinal(data, offSet, step );
             } else {
                 cache = cipher.doFinal(data, offSet, inputLen - offSet);
             }
             out.write(cache, 0, cache.length);
             i++;
-            offSet = i * MAX_ENCRYPT_BLOCK;
+            offSet = i * step;
         }
         byte[] encryptedData = out.toByteArray();
         out.close();
@@ -85,19 +90,38 @@ public class RSAUtil{
         int offSet = 0;
         byte[] cache;
         int i = 0;
+        int keyBit = getKeySize(privateK);
+        //get step
+        int step = keyBit / 8 ;
         // Sectional Encryption of Data
         while (inputLen - offSet > 0) {
-            if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
-                cache = cipher.doFinal(text, offSet, MAX_DECRYPT_BLOCK);
+            if (inputLen - offSet > step) {
+                cache = cipher.doFinal(text, offSet, step);
             } else {
                 cache = cipher.doFinal(text, offSet, inputLen - offSet);
             }
             out.write(cache, 0, cache.length);
             i++;
-            offSet = i * MAX_DECRYPT_BLOCK;
+            offSet = i * step;
         }
         byte[] decryptedData = out.toByteArray();
         out.close();
         return decryptedData;
+    }
+
+    /**
+     * getKeySize
+     * @param key key
+     * @return int
+     */
+    private static int getKeySize( Key key) {
+        if(key instanceof RSAPublicKey) {
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) key;
+            return rsaPublicKey.getModulus().bitLength();
+        } else if(key instanceof RSAPrivateKey){
+            RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) key;
+            return rsaPrivateKey.getModulus().bitLength();
+        }
+        return 0;
     }
 }
