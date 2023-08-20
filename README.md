@@ -88,11 +88,6 @@ public @interface Decrypt{
 
 ```
 
-### 3.About author
-![码农届首家互娱自媒体](https://images.gitee.com/uploads/images/2020/0529/112357_aac5a702_1674154.jpeg "kxmn.jpg")
-- Blog：https://shuibo.cn
-- QQ群：7277991 [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=d919a3676fe81a081cf90698a55b38c162285c92ef3c7a529972f39cd7787ef9)
-
 
 
 
